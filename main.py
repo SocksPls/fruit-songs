@@ -6,7 +6,7 @@ def getSongList():
     chars = "1abcdefghijklmnopqrstuvwxyz"
     baseurl = "http://www.songfacts.com/browse-song-"
     for i in chars:
-        print(i)
+        print("[*] Searching letter " + i, end="\r")
         firstPage = baseurl+i+"-1.php"
         page = BeautifulSoup(requests.get(firstPage).text, 'lxml')
 
@@ -15,9 +15,9 @@ def getSongList():
 
         try:
             numPages = int(page.find("div", {"class": "pagin-orange"}).find_all("a")[1].text)
-            print(numPages)
         
             for j in range(2,numPages+1):
+                print("[*] Searching letter " + i + ", page " + str(j) + " of " + str(numPages), end="   \r")
                 page = BeautifulSoup(requests.get(baseurl+i+"-"+str(j)+".php").text, 'lxml')
                 orangelist = page.find("ul", {"class": "songullist-orange"})
                 songList.extend(orangelist.text.split("\n"))
@@ -33,4 +33,5 @@ def findSongs(songList, word="fruit"):
             songsWithWord.append(song)
     return songsWithWord
 
-print(findSongs(getSongList()))
+word = input("Word to search for (blank for 'fruit'): ")
+print(findSongs(getSongList(), word=word.lower() if word != '' else 'fruit'))
